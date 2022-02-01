@@ -17,56 +17,48 @@ from setuptools import setup, Extension
 import os, shutil, sys
 
 if sys.platform == 'win32':
-    LIB_NAMES = ['ssleay32MD', 'libeay32MD']
+    LIB_NAMES = ['libssl64MD', 'libcrypto64MD']
 else:
     LIB_NAMES = ['ssl']
 
 _sslpsk = Extension('sslpsk._sslpsk',
                     sources = ['sslpsk/_sslpsk.c'],
-                    libraries = LIB_NAMES
+                    libraries = LIB_NAMES,
+                    library_dirs = ['openssl/lib/VC/'],
+                    include_dirs = ['openssl/include']
 )
 
-try:
-    # Symlink the libs so they can be included in the package data
-    if sys.platform == 'win32':
-        for lib in LIB_NAMES:
-            shutil.copy2('openssl/bin/%s.dll'%lib, 'sslpsk/')
-
-    setup(
-        name = 'sslpsk',
-        version = '1.0.0',
-        description = 'Adds TLS-PSK support to the Python ssl package',
-        author = 'David R. Bild',
-        author_email = 'david@davidbild.org',
-        license="Apache 2.0",
-        url = 'https://github.com/drbild/sslpsk',
-        download_url = 'https://github.com/drbild/sslpsk/archive/1.0.0.tar.gz',
-        keywords = ['ssl', 'tls', 'psk', 'tls-psk', 'preshared key'],
-        classifiers = [
-            'Development Status :: 5 - Production/Stable',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: Apache Software License',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 2',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.4',
-            'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: Implementation :: CPython',
-            'Operating System :: POSIX',
-            'Operating System :: Unix',
-            'Operating System :: MacOS',
-            'Operating System :: Microsoft'
-        ],
-        packages = ['sslpsk', 'sslpsk.test'],
-        ext_modules = [_sslpsk],
-        package_data = {'' : ['%s.dll'%lib for lib in LIB_NAMES]},
-        test_suite = 'sslpsk.test',
-        zip_safe = False
-    )
-
-finally:
-    if sys.platform == 'win32':
-        for lib in LIB_NAMES:
-            os.remove('sslpsk/%s.dll'%lib)
+setup(
+    name = 'sslpsk',
+    version = '1.0.0',
+    description = 'Adds TLS-PSK support to the Python ssl package',
+    author = 'David R. Bild',
+    author_email = 'david@davidbild.org',
+    license="Apache 2.0",
+    url = 'https://github.com/drbild/sslpsk',
+    download_url = 'https://github.com/drbild/sslpsk/archive/1.0.0.tar.gz',
+    keywords = ['ssl', 'tls', 'psk', 'tls-psk', 'preshared key'],
+    classifiers = [
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Operating System :: POSIX',
+        'Operating System :: Unix',
+        'Operating System :: MacOS',
+        'Operating System :: Microsoft'
+    ],
+    packages = ['sslpsk', 'sslpsk.test'],
+    ext_modules = [_sslpsk],
+    include_package_data=True,
+    package_data = {'libssl' : ['openssl/bin/libssl-1_1-x64.dll', 'openssl/bin/libcrypto-1_1-x64.dll']},
+    test_suite = 'sslpsk.test',
+    zip_safe = False
+)
